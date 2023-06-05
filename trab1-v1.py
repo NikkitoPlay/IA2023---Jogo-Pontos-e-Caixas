@@ -40,7 +40,7 @@ class Quartos:
             linhas[0][self.B] = 1
             return True
         else:
-            desenhaMsg(janela, 400, 75, "Jogada inválida!")
+            desenhaMsg(janela, 400, 90, "Jogada inválida!", 30, (255,255,0))
             return False
 
     def verificaQuarto(self) -> bool :#verifica se o quarto atual foi completado      
@@ -48,9 +48,9 @@ class Quartos:
            return True
 
 #funcoes
-def desenhaMsg(janela, x, y, mensagem): # apresenta uma mensagem na posicao x,y
-    fonte = pygame.font.SysFont(None, 36)
-    texto = fonte.render(mensagem, True, (255, 255, 255))
+def desenhaMsg(janela, x, y, mensagem, tamFont, cor): # apresenta uma mensagem na posicao x,y
+    fonte = pygame.font.SysFont(None, tamFont)
+    texto = fonte.render(mensagem, True, cor)
     posicaoTexto = texto.get_rect()
     posicaoTexto.centerx = x
     posicaoTexto.centery = y
@@ -58,15 +58,15 @@ def desenhaMsg(janela, x, y, mensagem): # apresenta uma mensagem na posicao x,y
     janela.blit(texto, posicaoTexto)
 
 def desenhaHUD(janela, listPlayers, nJogadas):
-    pygame.draw.rect(janela, cor_fundo, (0, 50, 800, 50))
+    pygame.draw.rect(janela, cor_fundo, (0, 20, 800, 50))
     if nJogadas == 0:
-        desenhaMsg(janela, 400, 75, "Jogada do PLAYER!")
+        desenhaMsg(janela, 400, 40, "Turno do PLAYER!", 39, (255, 255, 255))
     elif nJogadas % 2 == 0:
-        desenhaMsg(janela, 400, 75, "Jogada do PLAYER!")
+        desenhaMsg(janela, 400, 40, "Turno do PLAYER!", 39, (255, 255, 255))
     else:
-        desenhaMsg(janela, 400, 75, "Vez da CPU!")
-    desenhaMsg(janela, 235, 750, "PLAYER: {}".format(listPlayers[0].pontuacao))
-    desenhaMsg(janela, 550, 750, "CPU: {}".format(listPlayers[1].pontuacao))
+        desenhaMsg(janela, 400, 40, "Turno da CPU!",39, (255, 255, 255))
+    desenhaMsg(janela, 235, 750, "PLAYER: {}".format(listPlayers[0].pontuacao), 39, (255, 255, 255))
+    desenhaMsg(janela, 550, 750, "CPU: {}".format(listPlayers[1].pontuacao), 39, (255, 255, 255))
 
 def desenhaTabuleiro(janela, listaQuartos):
     dim = 160
@@ -126,7 +126,7 @@ def desenhaTabuleiro(janela, listaQuartos):
             if qrt.conquistador == 1:
                 cor_quarto = (205,133,63)# cpu
             if qrt.conquistador == 0:
-                cor_quarto = (50,205,50) # player
+                cor_quarto = (56,155,219) # player
             desenhaMarcaPonto(janela, qrt, cor_quarto)
 
 def desenhaSelecaoQuarto(janela, quarto, qrtAnterior):
@@ -200,7 +200,6 @@ largura = 800
 altura = 800
 
 cor_fundo = (94, 10, 11) #dark red
-cor_corrente = (0,0,0)
 
 #inicia os quartos
 listQuartos = [] 
@@ -242,13 +241,15 @@ while executando:
             x, y = pygame.mouse.get_pos()
             idQuarto = getId(x, y)
             if idQuarto:
+                pygame.draw.rect(janela, cor_fundo, (0, 75, 800, 30))
                 quarto = selecionaQuarto(listQuartos, idQuarto)
                 desenhaSelecaoQuarto(janela, quarto, qrtAnterior)
                 qrtAnterior = quarto
             else:
                 quarto = None
-                desenhaMsg(janela, 400, 75, "Espaço inválido!")
+                desenhaMsg(janela, 400, 90, "Espaço inválido!", 30, (255,255,0))
         elif evento.type == pygame.KEYDOWN:
+            pygame.draw.rect(janela, cor_fundo, (0, 75, 800, 30)) # limpa o espaço de desenho do avisos
             if quarto is not None and quarto.conquistador == -1:
                 if evento.key == pygame.K_a:
                     if quarto.setLinha(LEFT):
@@ -266,7 +267,7 @@ while executando:
                 for pl in listPlayers:
                     print(pl.pontuacao)
             else:
-               desenhaMsg(janela, 400, 75, "Espaço inválido!") 
+               desenhaMsg(janela, 400, 90, "Espaço inválido!", 30, (255,255,0)) 
     desenhaTabuleiro(janela, listQuartos)
     desenhaHUD(janela, listPlayers, nJogadas)
     pygame.display.update()
