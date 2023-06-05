@@ -40,7 +40,7 @@ class Quartos:
             linhas[0][self.B] = 1
             return True
         else:
-            desenhaMsg(janela, 400, 75, "Posição indisponível, escolha outra!")
+            desenhaMsg(janela, 400, 75, "Jogada inválida!")
             return False
 
     def verificaQuarto(self) -> bool :#verifica se o quarto atual foi completado      
@@ -57,7 +57,14 @@ def desenhaMsg(janela, x, y, mensagem): # apresenta uma mensagem na posicao x,y
     pygame.draw.rect(janela, cor_fundo, posicaoTexto)
     janela.blit(texto, posicaoTexto)
 
-def desenhaHUD(janela, listPlayers):
+def desenhaHUD(janela, listPlayers, nJogadas):
+    pygame.draw.rect(janela, cor_fundo, (0, 50, 800, 50))
+    if nJogadas == 0:
+        desenhaMsg(janela, 400, 75, "Jogada do PLAYER!")
+    elif nJogadas % 2 == 0:
+        desenhaMsg(janela, 400, 75, "Jogada do PLAYER!")
+    else:
+        desenhaMsg(janela, 400, 75, "Vez da CPU!")
     desenhaMsg(janela, 235, 750, "PLAYER: {}".format(listPlayers[0].pontuacao))
     desenhaMsg(janela, 550, 750, "CPU: {}".format(listPlayers[1].pontuacao))
 
@@ -239,7 +246,8 @@ while executando:
                 desenhaSelecaoQuarto(janela, quarto, qrtAnterior)
                 qrtAnterior = quarto
             else:
-                desenhaMsg(janela, 400, 75, "Por favor, escolha um espaço válido!")
+                quarto = None
+                desenhaMsg(janela, 400, 75, "Espaço inválido!")
         elif evento.type == pygame.KEYDOWN:
             if quarto is not None and quarto.conquistador == -1:
                 if evento.key == pygame.K_a:
@@ -257,8 +265,10 @@ while executando:
                 marcaPonto(listQuartos, nJogadas, listPlayers)
                 for pl in listPlayers:
                     print(pl.pontuacao)
+            else:
+               desenhaMsg(janela, 400, 75, "Espaço inválido!") 
     desenhaTabuleiro(janela, listQuartos)
-    desenhaHUD(janela, listPlayers)
+    desenhaHUD(janela, listPlayers, nJogadas)
     pygame.display.update()
 # Encerrar o Pygame
 pygame.quit()
