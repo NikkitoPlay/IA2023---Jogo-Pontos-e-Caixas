@@ -57,6 +57,21 @@ def desenhaMsg(janela, x, y, mensagem): # apresenta uma mensagem na posicao x,y
     pygame.draw.rect(janela, cor_fundo, posicaoTexto)
     janela.blit(texto, posicaoTexto)
 
+def desenhaHUD(janela, listPlayers):
+    fonte = pygame.font.SysFont(None, 36)
+    texto = fonte.render("PLAYER:", True, (255, 255, 255))
+    posicaoTexto = texto.get_rect()
+    posicaoTexto.centerx = 235
+    posicaoTexto.centery = 750
+    texto1 = fonte.render("CPU:", True, (255, 255, 255))
+    posicaoTexto1 = texto1.get_rect()
+    posicaoTexto1.centerx = 550
+    posicaoTexto1.centery = 750
+    pygame.draw.rect(janela, cor_fundo, posicaoTexto)
+    janela.blit(texto, posicaoTexto)
+    pygame.draw.rect(janela, cor_fundo, posicaoTexto1)
+    janela.blit(texto1, posicaoTexto1)
+
 def desenhaTabuleiro(janela, listaQuartos):
     dim = 160
     for j in range (1, 5):
@@ -141,14 +156,15 @@ def selecionaQuarto(listQrt, id) -> Quartos:
         if qrt.id == id:
             return qrt
         
-def marcaPonto(quarto, nJogadas, listaPlayers):
-    if quarto.verificaQuarto():
-        if nJogadas % 2 == 0:
-            quarto.conquistador = CPU
-            listaPlayers[1].aumentaPontuacao()
-        else:
-            quarto.conquistador = PLAYER
-            listaPlayers[0].aumentaPontuacao()
+def marcaPonto(lQuartos, nJogadas, listaPlayers):
+    for quarto in lQuartos:
+        if quarto.verificaQuarto():
+            if nJogadas % 2 == 0 and quarto.conquistador == -1:
+                quarto.conquistador = CPU
+                listaPlayers[1].aumentaPontuacao()
+            elif nJogadas % 2 != 0 and quarto.conquistador == -1:
+                quarto.conquistador = PLAYER
+                listaPlayers[0].aumentaPontuacao()
  
 def getId(x_pos, y_pos) -> int:
             if y_pos >= 160 and y_pos < 320: #primeira linha de quartos
@@ -249,10 +265,11 @@ while executando:
                 elif evento.key == pygame.K_s:
                     if quarto.setLinha(BOTTOM):
                         nJogadas += 1
-                marcaPonto(quarto, nJogadas, listPlayers)
+                marcaPonto(listQuartos, nJogadas, listPlayers)
                 for pl in listPlayers:
                     print(pl.pontuacao)
     desenhaTabuleiro(janela, listQuartos)
+    desenhaHUD(janela, listPlayers)
     pygame.display.update()
 # Encerrar o Pygame
 pygame.quit()
