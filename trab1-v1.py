@@ -58,19 +58,8 @@ def desenhaMsg(janela, x, y, mensagem): # apresenta uma mensagem na posicao x,y
     janela.blit(texto, posicaoTexto)
 
 def desenhaHUD(janela, listPlayers):
-    fonte = pygame.font.SysFont(None, 36)
-    texto = fonte.render("PLAYER:", True, (255, 255, 255))
-    posicaoTexto = texto.get_rect()
-    posicaoTexto.centerx = 235
-    posicaoTexto.centery = 750
-    texto1 = fonte.render("CPU:", True, (255, 255, 255))
-    posicaoTexto1 = texto1.get_rect()
-    posicaoTexto1.centerx = 550
-    posicaoTexto1.centery = 750
-    pygame.draw.rect(janela, cor_fundo, posicaoTexto)
-    janela.blit(texto, posicaoTexto)
-    pygame.draw.rect(janela, cor_fundo, posicaoTexto1)
-    janela.blit(texto1, posicaoTexto1)
+    desenhaMsg(janela, 235, 750, "PLAYER: {}".format(listPlayers[0].pontuacao))
+    desenhaMsg(janela, 550, 750, "CPU: {}".format(listPlayers[1].pontuacao))
 
 def desenhaTabuleiro(janela, listaQuartos):
     dim = 160
