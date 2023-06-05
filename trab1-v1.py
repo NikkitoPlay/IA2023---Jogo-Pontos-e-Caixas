@@ -267,9 +267,16 @@ while executando:
                 for pl in listPlayers:
                     print(pl.pontuacao)
             else:
-               desenhaMsg(janela, 400, 90, "Espaço inválido!", 30, (255,255,0)) 
-    desenhaTabuleiro(janela, listQuartos)
-    desenhaHUD(janela, listPlayers, nJogadas)
+               desenhaMsg(janela, 400, 90, "Espaço inválido!", 30, (255,255,0))
+    if nJogadas == 24:
+        janela.fill(cor_fundo)
+        if listPlayers[0].pontuacao > listPlayers[1].pontuacao:
+            desenhaMsg(janela, 400, 400, "PLAYER GANHOU", 50, (255,255,0))
+        else:
+            desenhaMsg(janela, 400, 400, "CPU GANHOU", 50, (255,255,0))
+    else:
+        desenhaTabuleiro(janela, listQuartos)
+        desenhaHUD(janela, listPlayers, nJogadas)
     pygame.display.update()
 # Encerrar o Pygame
 pygame.quit()
