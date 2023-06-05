@@ -1,6 +1,14 @@
 import pygame
 import numpy as np
 
+class Player:
+    def __init__(self, id) -> None:
+        self.id = id
+        self.pontuacao = 0
+    
+    def aumentaPontuacao(self):
+        self.pontuacao += 1
+
 class Quartos:
     def __init__(self, id, l, t, r, b, pos) -> None:
         self.id = id
@@ -9,26 +17,31 @@ class Quartos:
         self.T = t
         self.R = r
         self.B = b
-
         self.pos = pos
-    
+        self.conquistador = -1
+
     def _verificaPosicao(self, indice) -> bool: #verifica se a linha já foi desenhada
         if linhas[0][indice] != 0:
             return False
         else:
             return True
 
-    def setLinha(self, direcao):
+    def setLinha(self, direcao) -> bool:
         if direcao == LEFT and self._verificaPosicao(self.L):
             linhas[0][self.L] = 1
+            return True
         elif direcao == TOP and self._verificaPosicao(self.T):
             linhas[0][self.T] = 1
+            return True
         elif direcao == RIGHT and self._verificaPosicao(self.R):
             linhas[0][self.R] = 1
+            return True
         elif direcao == BOTTOM and self._verificaPosicao(self.B):
             linhas[0][self.B] = 1
+            return True
         else:
             desenhaMsg(janela, 400, 75, "Posição indisponível, escolha outra!")
+            return False
 
     def verificaQuarto(self) -> bool :#verifica se o quarto atual foi completado      
         if linhas[0, self.L] and linhas[0, self.T] and linhas[0, self.R] and linhas[0, self.B]:
@@ -44,26 +57,11 @@ def desenhaMsg(janela, x, y, mensagem): # apresenta uma mensagem na posicao x,y
     pygame.draw.rect(janela, cor_fundo, posicaoTexto)
     janela.blit(texto, posicaoTexto)
 
-def desenhaTabuleiro(janela):
-    janela.fill(cor_fundo)
+def desenhaTabuleiro(janela, listaQuartos):
     dim = 160
     for j in range (1, 5):
         for i in range(1, 5):
             pygame.draw.circle(janela, (251, 162, 23), (i*dim, j*dim), 5)
-
-def desenhaSelecaoQuarto(janela, quarto):
-    superficie = pygame.Surface((160, 160), pygame.SRCALPHA)
-    cor_transparente = (148, 26, 28, 128)  # RGBA, onde 128 define a transparência (0 é totalmente transparente, 255 é opaco)
-    pygame.draw.rect(superficie, cor_transparente, (10, 10, 140, 140))
-    janela.blit(superficie, quarto.pos)
-    
-
-def selecionaQuarto(listQrt, id) -> Quartos:
-    for qrt in listQrt:
-        if qrt.id == id:
-            return qrt
-        
-def desenhaLinhas(janela):
     if linhas[0][0]:
         pygame.draw.line(janela, (251, 162, 23), (160, 160), (160, 320), 2)
     if linhas[0][1]:
@@ -112,10 +110,46 @@ def desenhaLinhas(janela):
         pygame.draw.line(janela, (251, 162, 23), (640, 480), (640, 640), 2)
     if linhas[0][23]:
         pygame.draw.line(janela, (251, 162, 23), (160, 640), (320, 640), 2)
-    pass
+    for qrt in listaQuartos:
+        if qrt.verificaQuarto():
+            if qrt.conquistador == 1:
+                cor_quarto = (205,133,63)# cpu
+            if qrt.conquistador == 0:
+                cor_quarto = (50,205,50) # player
+            desenhaMarcaPonto(janela, qrt, cor_quarto)
 
-def marcaPonto(quarto):
-    pass
+def desenhaSelecaoQuarto(janela, quarto, qrtAnterior):
+    if qrtAnterior is not None:
+        superficie = pygame.Surface((160, 160), pygame.SRCALPHA)
+        cor = (94, 10, 11) 
+        pygame.draw.rect(superficie, cor, (10, 10, 140, 140))
+        janela.blit(superficie, qrtAnterior.pos)    
+    
+    superficie = pygame.Surface((160, 160), pygame.SRCALPHA)
+    cor_transparente = (148, 26, 28, 128)  # RGBA, onde 128 define a transparência (0 é totalmente transparente, 255 é opaco)
+    pygame.draw.rect(superficie, cor_transparente, (10, 10, 140, 140))
+    janela.blit(superficie, quarto.pos)
+
+def desenhaMarcaPonto(janela, quarto, cor):
+    superficie = pygame.Surface((160, 160), pygame.SRCALPHA)
+    pygame.draw.rect(superficie, cor, (10, 10, 140, 140))
+    janela.blit(superficie, quarto.pos)
+    
+
+def selecionaQuarto(listQrt, id) -> Quartos:
+    for qrt in listQrt:
+        if qrt.id == id:
+            return qrt
+        
+def marcaPonto(quarto, nJogadas, listaPlayers):
+    if quarto.verificaQuarto():
+        if nJogadas % 2 == 0:
+            quarto.conquistador = CPU
+            listaPlayers[1].aumentaPontuacao()
+        else:
+            quarto.conquistador = PLAYER
+            listaPlayers[0].aumentaPontuacao()
+ 
 def getId(x_pos, y_pos) -> int:
             if y_pos >= 160 and y_pos < 320: #primeira linha de quartos
                 if x_pos >= 160 and x_pos < 320:#primeiro quarto
@@ -146,11 +180,15 @@ TOP = 1
 RIGHT = 2
 BOTTOM = 3
 
+PLAYER = 0
+CPU = 1
+
 #dimensoes da janela
 largura = 800
 altura = 800
 
 cor_fundo = (94, 10, 11) #dark red
+cor_corrente = (0,0,0)
 
 #inicia os quartos
 listQuartos = [] 
@@ -172,9 +210,15 @@ janela = pygame.display.set_mode((largura, altura))
 pygame.display.set_caption("Jogo dos Pontinhos")
 
 linhas = np.zeros((1, 24)) #representa as linhas que liga os pontinhos
-nJogadas = 1
+nJogadas = 0
 
-desenhaTabuleiro(janela)
+player = Player(PLAYER)
+cpu = Player(CPU)
+listPlayers = [player, cpu]
+print(listPlayers)
+qrtAnterior = None
+
+janela.fill(cor_fundo)
 
 # Loop principal do jogo
 executando = True
@@ -185,28 +229,30 @@ while executando:
         elif evento.type == pygame.MOUSEBUTTONDOWN:
             x, y = pygame.mouse.get_pos()
             idQuarto = getId(x, y)
-            desenhaTabuleiro(janela)
             if idQuarto:
                 quarto = selecionaQuarto(listQuartos, idQuarto)
-                desenhaSelecaoQuarto(janela, quarto)
+                desenhaSelecaoQuarto(janela, quarto, qrtAnterior)
+                qrtAnterior = quarto
             else:
                 desenhaMsg(janela, 400, 75, "Por favor, escolha um espaço válido!")
         elif evento.type == pygame.KEYDOWN:
-            if quarto is not None:
+            if quarto is not None and quarto.conquistador == -1:
                 if evento.key == pygame.K_a:
-                    quarto.setLinha(LEFT)
-                    nJogadas += 1
-                if evento.key == pygame.K_w:
-                    quarto.setLinha(TOP)
-                    nJogadas += 1
-                if evento.key == pygame.K_d:
-                    quarto.setLinha(RIGHT)
-                    nJogadas += 1
-                if evento.key == pygame.K_s:
-                    quarto.setLinha(BOTTOM)
-                    nJogadas += 1
-    desenhaLinhas(janela)
+                    if quarto.setLinha(LEFT):
+                        nJogadas += 1
+                elif evento.key == pygame.K_w:
+                    if quarto.setLinha(TOP):
+                        nJogadas += 1
+                elif evento.key == pygame.K_d:
+                    if quarto.setLinha(RIGHT):
+                        nJogadas += 1
+                elif evento.key == pygame.K_s:
+                    if quarto.setLinha(BOTTOM):
+                        nJogadas += 1
+                marcaPonto(quarto, nJogadas, listPlayers)
+                for pl in listPlayers:
+                    print(pl.pontuacao)
+    desenhaTabuleiro(janela, listQuartos)
     pygame.display.update()
-
 # Encerrar o Pygame
 pygame.quit()
