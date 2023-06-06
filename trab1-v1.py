@@ -146,7 +146,6 @@ def desenhaMarcaPonto(janela, quarto, cor):
     pygame.draw.rect(superficie, cor, (10, 10, 140, 140))
     janela.blit(superficie, quarto.pos)
     
-
 def selecionaQuarto(listQrt, id) -> Quartos:
     for qrt in listQrt:
         if qrt.id == id:
@@ -201,6 +200,14 @@ altura = 800
 
 cor_fundo = (94, 10, 11) #dark red
 
+linhas = np.zeros((1, 24)) #representa as linhas que liga os pontinhos
+nJogadas = 0
+player = Player(PLAYER)
+cpu = Player(CPU)
+listPlayers = [player, cpu]
+quarto = None
+qrtAnterior = None
+
 #inicia os quartos
 listQuartos = [] 
 listQuartos.append(Quartos(1, 0,1,2,11, (160,160)))
@@ -220,15 +227,6 @@ pygame.init()
 janela = pygame.display.set_mode((largura, altura))
 pygame.display.set_caption("Jogo dos Pontinhos")
 
-linhas = np.zeros((1, 24)) #representa as linhas que liga os pontinhos
-nJogadas = 0
-
-player = Player(PLAYER)
-cpu = Player(CPU)
-listPlayers = [player, cpu]
-print(listPlayers)
-qrtAnterior = None
-
 janela.fill(cor_fundo)
 
 # Loop principal do jogo
@@ -246,8 +244,7 @@ while executando:
                 desenhaSelecaoQuarto(janela, quarto, qrtAnterior)
                 qrtAnterior = quarto
             else:
-                quarto = None
-                desenhaMsg(janela, 400, 90, "Espaço inválido!", 30, (255,255,0))
+                desenhaMsg(janela, 400, 90, "Fora dos Limites!", 30, (255,255,0))
         elif evento.type == pygame.KEYDOWN:
             pygame.draw.rect(janela, cor_fundo, (0, 75, 800, 30)) # limpa o espaço de desenho do avisos
             if quarto is not None and quarto.conquistador == -1:
@@ -264,8 +261,10 @@ while executando:
                     if quarto.setLinha(BOTTOM):
                         nJogadas += 1
                 marcaPonto(listQuartos, nJogadas, listPlayers)
+                if listPlayers[0].pontuacao >= 5 or listPlayers[1].pontuacao >= 5:
+                    nJogadas = 24
             else:
-               desenhaMsg(janela, 400, 90, "Espaço inválido!", 30, (255,255,0))
+               desenhaMsg(janela, 400, 90, "Nada Selecionado!", 30, (255,255,0))
     if nJogadas == 24:
         janela.fill(cor_fundo)
         if listPlayers[0].pontuacao > listPlayers[1].pontuacao:
