@@ -264,8 +264,6 @@ while executando:
                     if quarto.setLinha(BOTTOM):
                         nJogadas += 1
                 marcaPonto(listQuartos, nJogadas, listPlayers)
-                for pl in listPlayers:
-                    print(pl.pontuacao)
             else:
                desenhaMsg(janela, 400, 90, "Espaço inválido!", 30, (255,255,0))
     if nJogadas == 24:
