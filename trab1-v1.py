@@ -268,9 +268,9 @@ while executando:
     if nJogadas == 24:
         janela.fill(cor_fundo)
         if listPlayers[0].pontuacao > listPlayers[1].pontuacao:
-            desenhaMsg(janela, 400, 400, "PLAYER GANHOU", 50, (255,255,0))
+            desenhaMsg(janela, 400, 400, "PLAYER GANHOU!!", 50, (255,255,0))
         else:
-            desenhaMsg(janela, 400, 400, "CPU GANHOU", 50, (255,255,0))
+            desenhaMsg(janela, 400, 400, "CPU GANHOU!!", 50, (255,255,0))
     else:
         desenhaTabuleiro(janela, listQuartos)
         desenhaHUD(janela, listPlayers, nJogadas)
