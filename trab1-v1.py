@@ -1,3 +1,6 @@
+## ESSA VERSÃO PERMITE QUE SEJA JOGADO POR DOIS JOGADORES
+## IA NÃO IMPLEMENTADA
+
 import pygame
 import numpy as np
 
