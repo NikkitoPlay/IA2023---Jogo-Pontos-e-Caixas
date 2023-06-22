@@ -2,6 +2,7 @@
 # LIMITAÇÃO DA ALTURA DA ARVORE RESOLVEU O PROBLEMA DE TRAVAMENTO E POSSIBILITOU A REPRESENTAÇÃO DA DIFICULDADE DO JOGO
 # A DIFICULDADE DO JOGO (ALTURA DA ARVORE) INICIARÁ BAIXA DEVIDO AO ALTO NUMERO DE JOGADAS POSSIVEIS
 # A DIFICULDADE SERÁ MUDADA NO MEIO DO JOGO, ONDE A ARVORE JÁ GASTA MENOS PROCESSAMENTO PARA SER MONTADA
+# HEURISTICA EM CADA NÓ FOLHA FOI CALCULADO
 
 import copy
 import random
@@ -198,6 +199,11 @@ def criaFilhos(no_pai, dificuldade): #conforme o jogo passa pode ficar mais difi
     indices = np.where(no_pai.estado == 0)[0]
     random.shuffle(indices)
     it = 0
+
+    if dificuldade == 0 or len(indices) == 0: #verifica se esta em um nó folha
+        no_pai.heuristica = no_pai.l_players[1].pontuacao - root.l_players[1].pontuacao
+        return
+    
     if dificuldade > 0:
         for i in indices:
             nome = f"{no_pai.name}-{it}"
@@ -207,7 +213,8 @@ def criaFilhos(no_pai, dificuldade): #conforme o jogo passa pode ficar mais difi
                               estado=novo_estado, 
                               n_jogadas=(no_pai.n_jogadas+1), 
                               l_players=copy.deepcopy(no_pai.l_players), 
-                              l_quartos=copy.deepcopy(no_pai.l_quartos))
+                              l_quartos=copy.deepcopy(no_pai.l_quartos),
+                              heuristica = 0)
             marcaPonto(novo_filho.n_jogadas, novo_filho.l_players, novo_filho.l_quartos, novo_filho.estado)
             criaFilhos(novo_filho, (dificuldade-1))
             it += 1
@@ -297,11 +304,12 @@ while executando:
                 root = Node("A", estado=linhas[0].copy(), 
                             n_jogadas=nJogadas, 
                             l_players=copy.deepcopy(listPlayers), 
-                            l_quartos=copy.deepcopy(listQuartos))
+                            l_quartos=copy.deepcopy(listQuartos),
+                            heuristica=0)
                 criaFilhos(root, level)
 
                 for pre, _, node in RenderTree(root):
-                    print("%s%s" % (pre, str(node.l_players[1].pontuacao)))
+                    print("%s%s" % (pre, str(node.heuristica)))
             else:
                desenhaMsg(janela, 400, 90, "Nada Selecionado!", 30, (255,255,0))
     if nJogadas == 24:
