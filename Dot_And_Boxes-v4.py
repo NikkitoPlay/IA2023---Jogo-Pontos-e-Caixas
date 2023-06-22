@@ -1,8 +1,9 @@
-# IA já faz joagadas, mas a pontuação do jogo ainda não muda com base nas jogadas da CPU
+# IA IMPLEMENTADA
 
 import copy
 import random
 import pygame
+import math
 import numpy as np
 from anytree import Node, RenderTree, PreOrderIter
 
@@ -197,7 +198,7 @@ def criaFilhos(no_pai, dificuldade): #conforme o jogo passa pode ficar mais difi
     it = 0
 
     if dificuldade == 0 or len(indices) == 0: #verifica se esta em um nó folha
-        no_pai.heuristica = no_pai.l_players[1].pontuacao - root.l_players[1].pontuacao #calcula a heuristica   
+        no_pai.heuristica = (no_pai.l_players[1].pontuacao - no_pai.l_players[0].pontuacao) - (root.l_players[1].pontuacao - root.l_players[0].pontuacao)**2 +1
         return
     
     if dificuldade > 0:
@@ -226,7 +227,7 @@ def listarAncestrais(no):
     ancestrais.reverse()
     return ancestrais
 
-def miniMax(node, profundidade):
+def miniMax(node, profundidade): #melhorar
     if profundidade == 0 or len(node.children) == 0:
         return node
     
@@ -334,16 +335,21 @@ while executando:
                             l_players=copy.deepcopy(listPlayers), 
                             l_quartos=copy.deepcopy(listQuartos),
                             heuristica=0)
+    
                 criaFilhos(root, level)
                 if nJogadas%2 != 0:
-                    linhas[0] = miniMax(root, level).estado
+                    melhor_jogada = miniMax(root, level)
+                    linhas[0] = melhor_jogada.estado
+                    print(linhas[0])
+                    listPlayers = melhor_jogada.l_players
+                    listQuartos = melhor_jogada.l_quartos
                     nJogadas += 1
-                if nJogadas == 14: # aumenta a dificuldade no final
-                    level = 4
-                if listPlayers[0].pontuacao >= 5 or listPlayers[1].pontuacao >= 5:
-                    nJogadas = 24
-                #for pre, _, node in RenderTree(root):
-                    #print("%s%s" % (pre, str(node.heuristica)))
+                #if listPlayers[0].pontuacao >= 5 or listPlayers[1].pontuacao >= 5:
+                    #nJogadas = 24
+                for pre, _, node in RenderTree(root):
+                    print("%s%s" % (pre, str(node.heuristica)))
+                
+                print(nJogadas)
             else:
                desenhaMsg(janela, 400, 90, "Nada Selecionado!", 30, (255,255,0))
     if nJogadas == 24:
