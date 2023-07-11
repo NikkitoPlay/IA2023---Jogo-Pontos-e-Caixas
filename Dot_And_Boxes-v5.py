@@ -1,3 +1,5 @@
+#IA MELHORADAA
+
 import copy
 import random
 import pygame
@@ -385,6 +387,8 @@ while executando:
                     level = 4
                 if nJogadas > 14:
                     level = 5
+                if nJogadas > 16:
+                    level = 6
                 root = Node("A", estado=linhas[0].copy(), 
                             n_jogadas=nJogadas, 
                             l_players=copy.deepcopy(listPlayers), 
@@ -405,7 +409,7 @@ while executando:
     if nJogadas == 24:
         janela.fill(cor_fundo)
         if listPlayers[0].pontuacao > listPlayers[1].pontuacao:
-            desenhaMsg(janela, 400, 400, "PARABÉNS, QUALQUER BURRO TAMBÉM GANHARIA!", 50, (255,255,0))
+            desenhaMsg(janela, 400, 400, "PLAYER GANHOU!", 50, (255,255,0))
             desenhaMsg(janela, 235, 750, "PLAYER: {}".format(listPlayers[0].pontuacao), 39, (255, 255, 255))
             desenhaMsg(janela, 550, 750, "CPU: {}".format(listPlayers[1].pontuacao), 39, (255, 255, 255))
         else:
